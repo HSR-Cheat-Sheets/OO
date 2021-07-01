@@ -1,0 +1,1036 @@
+%import template
+\input{./template.tex}
+
+% DocInfo
+\newcommand{\SUBJECT}{}
+\newcommand{\TITLE}{Cheat Sheet Objektorientierte Programmierung}
+
+\begin{document}
+
+%import front page
+% \input{./front.tex}
+
+%do multicols
+\begin{multicols*}{5}
+    \setlength{\columnseprule}{0.4pt}
+		\footnotesize
+		
+%import tableofcontents
+% \input{./tableofcontents.tex}
+
+\section{Allgemeines}
+	\subsection{Primitive Datentypen}
+		\begin{tabular}{p{.7cm} | p{2.1cm} | l}
+			boolean&Boolescher Wert&true, false\\
+			char&Textzeichen&'a','B','0','ë',...\\
+			byte&Ganzzahl 8 Bit&-128 - 127\\
+			short&Ganzzahl 16 Bit&-32'768 - 32'767\\
+			int&Ganzzahl 32 Bit&-$2^{31}$ - $2^{31}$-1\\
+			long&Ganzzahl 64 Bit&-$2^{63}$ - $2^{63}$-1, 1L\\
+			float&Kommazahl 32 Bit&0.1f, 2e4f\\
+			double&Kommazahl 64 Bit&0.1, 2e4\\
+		\end{tabular}
+		\subsubsection{Specials}
+		a[double – int] $\rightarrow$ cannot convert double to int\\
+		0/0$\rightarrow$ArithmeticException div by zero\\
+		3.0/0 $\rightarrow$ Double.POSITIVE\_INFINITY\\
+		f + '''' != f$\rightarrow$ f ist null\\
+		g+1== g+2$\rightarrow$g=Double.POSITIVE\_INFINITY\\
+		h != h$\rightarrow$h = Float/Double.NaN\\
+		1 \% 0$\rightarrow$ArithmeticException div by zero\\
+		0 \% 1$\rightarrow$0\\
+		int<long<float$\rightarrow$Compiler-Fehler\\
+		0.0 / 0.f$\rightarrow$NaN (Double.NaN)\\
+		x + 1 == x $\rightarrow$ Double.POSITIVE\_INFINITY\\
+		d++ == --d$\rightarrow$ true\\ 
+		float vergleichen$\rightarrow$Math.abs(x – y) < delta\\
+		\vspace{8pt}
+	\subsection{Overloading \& Overriding}
+	\begin{enumerate}
+		\item Statischer Typ (links) anschauen
+		\item (null) anschauen $\rightarrow$ spezifischster wählen
+		\item Overriding beachten
+	\end{enumerate}
+	\textbf{Overloading:} Gleiche Methode wird mit anderem Typ überschrieben.\\
+	\textbf{Overriding:} Gleiche Methode wird 1:1 überschrieben. (@Override)
+	
+	
+
+
+
+	\subsection{Exceptions}
+	\begin{lstlisting}
+String method(String s) throws Exception {
+if (s == null) {
+throw new Exception("String is null"); } 
+		\end{lstlisting}
+		
+		\subsubsection{Exceptions behandeln}
+		\begin{lstlisting}
+try {
+... regular code ... } catch (Exception e) {
+... error handling ... } finally {
+	... statements ... }
+		\end{lstlisting}
+		\subsubsection{Eigene Exceptions}
+		\begin{lstlisting}
+class StringClipException extends Exception {
+	public StringClipException() {}
+	public StringClipException(String message) {
+		super(message); }}
+//------------------in Methode:------------------
+String clip(String s) throws StringClipException {
+	if (s == null) {
+	throw new StringClipException("no string"); } }
+		\end{lstlisting}
+		\subsubsection{Checked und Unchecked Exceptions}
+		\textcolor{b}{Checked Exceptions:}
+		\begin{itemize}
+			\item Exception muss behandelt werden (catch)
+			\item throws-Deklaration im Methodenkopf
+			\item Wird vom Compiler geprüft
+			\item \tiny \texttt{ClassNotFoundExc., IllegalAccessExc., EigeneExc.}
+		\end{itemize}
+		\textcolor{b}{Unchecked Exceptions}
+		\begin{itemize}
+			\item Keine throws-Deklaration/Behandlung nötig
+			\item Wird nicht vom Compiler geprüft
+			\item \tiny \texttt{RuntimeExc., NullPointerExc., IndexOutOfBoundsExc., Error}
+		\end{itemize}
+		
+	
+\section{Vererbung}
+	\subsubsection{Abstract Class}
+	\begin{lstlisting}
+public abstract class Vehicle {
+	//Vererbbare Methoden....
+	public abstract void drive();
+	\end{lstlisting}
+	\subsubsection{Erbende Klassen von Klassen}
+	\begin{lstlisting}
+public class Car extends Vehicle {
+	@Override
+	public void drive() {
+	System.out.println("Car");
+	//Ausfuehren der Vatermethode wenn nicht abstract
+	super.drive; 
+	\end{lstlisting}
+	\subsubsection{Erben von Interfaces}
+	\begin{lstlisting}
+public class RegularCar implements Vehicle {...}
+	\end{lstlisting}
+
+
+	\columnbreak
+
+
+
+
+\section{Interfaces}
+	\subsection{Allgemeines}
+	\begin{itemize}
+		\item Facette einer Klasse
+		\item Trennung Spezifikation und Implementation
+		\item Lollipop oder Hierarchische Mehrfachvererbung
+		\item Nur Klassen sind instanzierbar
+		\item Schnittstellen sind aber als statische Typen verwendbar (linke Seite)
+		\item Variablen in Interfaces sind Konstanten!
+		\item Keine Instanzvariablen im Interface
+	\end{itemize}
+	\subsection{Vererbung}
+		\subsubsection{Interface $\rightarrow$ Interface}
+			\begin{lstlisting}
+public interface Vehicle{...}
+public interface LandMobile extends Vehicle{...}
+			\end{lstlisting}
+		\subsubsection{Interface $\rightarrow$ Klasse}
+			\begin{lstlisting}
+public interface Vehicle{...}
+public class Car implements Vehicle{...}
+			\end{lstlisting}
+	\subsection{Default Methods}
+	\begin{itemize}
+		\item Falls Kollisionen bei Mehrfachvererbung 
+		\item Ähnlich zu Mehrfachvererbung von abstrakten Klassen
+		\item Keine Instanzvariablen in Schnittstelle!
+		\item Methoden können in Klasse überschrieben werden
+		\item Falls nicht überschrieben: Defaultmethode
+	\end{itemize}
+		\begin{lstlisting}
+interface Vehicle {
+	public default void printModel() {...method...}
+		\end{lstlisting}
+	\subsection{Functional Interface}
+
+
+		\begin{tabular}{|p{1.6cm} p{3.1cm}|}
+			\hline
+			Lambda & @FunctionalInterface\\
+			\hline
+			\hline
+			\tiny \texttt{x $\rightarrow$!x }&\tiny \texttt{interface BoolFunction \{ boolean apply(boolean x);\}}\\
+			\hline
+			\tiny \texttt{(x, y)$\rightarrow$x + y}&\tiny \texttt{interface IntFunction \{}\\
+			&\tiny \texttt{int apply(int x, int y);\}}\\
+			\hline
+			\tiny \texttt{p ->p.getName() + p.getAge()}& \tiny \texttt{interface Function \{String apply(Person p);\}}\\
+			\hline
+			\tiny \texttt{()$\rightarrow$System.out. print(''OK'')}&\tiny \texttt{interface Runable \{void run();\}}\\
+			\hline
+			\tiny \texttt{(p1, p2) -> p1.compareTo(p2)}&\tiny \texttt{interface Comparable<T> \{ int compareTo(T other);\}}\\
+			\hline
+			\tiny \texttt{(x, y, z) -> x.compareTo(y)== y.compareTo(x)}&\tiny \texttt{interface TreeSome<T> \{ boolean apply(T first, T second, T third)\}}\\
+			\hline
+		\end{tabular}
+
+
+
+
+
+
+
+
+\section{Lambda}
+
+	\begin{lstlisting}
+class Utils {
+static <T> void removeAll(Collection<T> collection,
+Predicate<T> criterion) {
+var it = collection.iterator(); while (it.hasNext()) 
+{if (criterion.test(it.next())) {it.remove(); }}}}
+	
+Utils.removeAll(people, p -> p.getAge() < 18); 
+//Lokale Variabel muss bei Lambda zugriff final!
+	\end{lstlisting}
+
+
+
+
+
+
+
+
+\section{Generics}
+
+	\subsubsection{Generische Klassen}
+	\begin{lstlisting}
+public class MyClass<T> {
+...
+public T add(T value1, T value2) { ... }
+//----------------in Main Methode----------------
+var intMyClass = new MyClass<Integer>(23);
+	\end{lstlisting}
+	\subsubsection{Generische Interfaces}
+		\begin{lstlisting}
+interface Iterator<E> {
+	boolean hasNext();
+	E next();}
+		\end{lstlisting}
+	\subsubsection{Generische Methoden}
+	\begin{lstlisting}
+public <E> Stack<E> multiPush(E value, int times) { 
+	var result = new Stack<E>();
+	for (int i = 0; i < times; i++) { 
+		result.push(value); } }
+	\end{lstlisting}
+	\subsubsection{Type Bounds}
+	\tiny \texttt{item.draw()} \footnotesize ist eine spezifische Methode, die nur von Grafik geerbten Klassen ausgeführt werden kann. Deshalb muss Type Bounds verwendet werden:
+	\begin{lstlisting}
+	class GraphicStack<T extends Graphic> {...}
+	\end{lstlisting}
+
+
+
+	\columnbreak
+
+
+
+	\section{Collections}
+	\subsection{List}
+		\subsubsection{ArrayList}
+			\begin{itemize}
+				\item Duplikate möglich
+				\item null ist auch einfügbar
+				\item Add/Remove während Iterierens $\rightarrow$ Fehler
+				\item get(), set(), add(): sehr schnell
+				\item remove(), contains(): langsam
+			\end{itemize}
+			\begin{lstlisting}
+ArrayList<String> stringList = new ArrayList<>();
+	stringList.add("OO"); //Add Element
+	stringList.add(0, "Bsys1"); //Add @ pos 0
+	String x = stringList.get(1); //get @ pos 1
+	stringList.set(0, "Bsys2"); //replace at pos 0
+	boolean b = stringList.contains("CN1")
+	stringList.remove("ICTh");
+	stringList.remove(1); //remove @ pos 1
+			\end{lstlisting}
+
+		\subsubsection{LinkedList}
+		\begin{itemize}
+			\item Verkettete Liste der Elemente
+			\item Duplikate möglich
+			\item Dynamisch hinzufügbar und entfernbar
+			\item Intern Doppelt verkettet
+			\item add(), remove(anfang/ende) sehr schnell
+			\item get(), set(), contains(), remove() langsam
+		\end{itemize}
+		\begin{lstlisting}
+List<String> firstList = new ArrayList<>();
+	//Gleiche Funktionen wie ArrayList
+		\end{lstlisting}
+
+		\subsubsection{Queue / Deques}
+		\begin{itemize}
+			\item Verkettete Liste der Elemente
+			\item Dynamisch hinzufügbar und entfernbar
+			\item LIFO oder FIFO möglich
+			\item Intern Doppelt verkettet
+		\end{itemize}
+		\begin{lstlisting}
+Deque<String> queue = new LinkedList<>();
+	queue.addLast(elem);
+	queue,addFirst(elem);
+	queue.removeFirst(elem);
+	queue.removeLast(elem);
+		\end{lstlisting}
+
+	\subsection{Set}
+		\subsubsection{HashSet}
+		\begin{itemize}
+			\item Keine Duplikate
+			\item Unsortiert 
+			\item Oft sehr effizient
+			\item In Hashtabelle gespeichert
+			\item Elemente geben hashCode() konsistent zu equals()
+		\end{itemize}
+		\begin{lstlisting}
+Set<String> otherSet = new HashSet<>();
+	set.add(elem);
+	set.addAll(list); //Collection of elem
+	set.size();
+	set.remove(elem);
+	set.isEmpty();
+	String[] a = (String[]) set.toArray();
+		\end{lstlisting}
+		\subsubsection{TreeSet}
+		\begin{itemize}
+			\item Keine Duplikate
+			\item Sortiert
+			\item immer effizient
+			\item In Binärbäumen gespeichert
+			\item Elemente implementieren Comparable und equals()
+		\end{itemize}
+		\begin{lstlisting}
+Set<String> firstSet = new TreeSet<>();
+	//Gleiche Funktionen wie TreeSet
+		\end{lstlisting}
+	
+	\subsection{Map}
+		\subsubsection{TreeMap}
+		\begin{itemize}
+			\item Mengen von Schlüssel-Wert-Paaren
+			\item Nach Schlüssel sortiert
+			\item immer effizient
+		\end{itemize}
+		\begin{lstlisting}
+Map<Integer, String> bachelors = new TreeMap<>();
+	map.put(20000, "Hello");
+	map.containsKey(key);
+	map.containsValue(value);
+	String x = map.get(20000);
+	for (int number : map.keySet()) { 
+		System.out.println(number);}// print all elem
+		\end{lstlisting}
+		\subsubsection{HashMap}
+		\begin{itemize}
+			\item Mengen von Schlüssel-Wert-Paaren
+			\item Unsortiert
+			\item oft sehr effizient
+		\end{itemize}
+		\begin{lstlisting}
+Map<Integer, String> map = new HashMap<>();
+	//Gleiche Funktionen wie HashMap
+		\end{lstlisting}
+
+
+
+\columnbreak
+
+
+
+
+\section{Stream API}
+	Deklarative Abfragen von Collections.
+	\begin{lstlisting}
+people.stream().sorted().forEach(System.out::println);
+	\end{lstlisting}
+	\subsection{Zwischenoperationen}
+		\begin{itemize}
+			\item \tiny \textcolor{b}{\texttt{filter(Predicate)}}
+				\footnotesize Rauspicken gem. Predicate
+			\item \tiny \textcolor{b}{\texttt{map(Function)}}
+				\footnotesize Projizieren gemäss Function
+			\item \tiny \textcolor{b}{\texttt{mapToInt(Function)}}
+				\footnotesize Proji. auf primitiver Typ
+			\item \tiny \textcolor{b}{\texttt{sorted()}}
+				\footnotesize Sortieren
+			\item \tiny \textcolor{b}{\texttt{distinct}}
+				\footnotesize Duplikate werden gelöscht
+			\item \tiny \textcolor{b}{\texttt{limit(long n)}}
+				\footnotesize Erste n Elemente liefern
+			\item \tiny \textcolor{b}{\texttt{skip(long n)}}
+				\footnotesize Erste n Elemente ignorieren
+		\end{itemize}
+	\subsection{Terminaloperationen}
+		\begin{itemize}
+			\item \tiny \textcolor{b}{\texttt{forEach(Consumer)}}
+				\footnotesize Pro Element anwenden
+			\item \tiny \textcolor{b}{\texttt{forEachOrderd(consumer)}}
+				\footnotesize Erhält die Reihenfolge der Elemente
+			\item \tiny \textcolor{b}{\texttt{count()}}
+				\footnotesize Anzahl Elemente
+			\item \tiny \textcolor{b}{\texttt{min(), max()}}
+				\footnotesize Mit Comparator Argument
+			\item \tiny \textcolor{b}{\texttt{average(), sum()}}
+				\footnotesize Nur bei int, long, double
+			\item \tiny \textcolor{b}{\texttt{findAny()}}
+				\footnotesize Gibt irgendein Element zurück
+			\item \tiny \textcolor{b}{\texttt{findFirst()}}
+				\footnotesize gibt erstes Element zurück
+		\end{itemize}
+	\subsection{Rückumwandlung}
+		\textcolor{b}{Zu Array:}
+		\begin{lstlisting}
+Person[] array = peopleStream.toArray(Person[]::new)
+		\end{lstlisting}
+		\textcolor{b}{Zu Collection:}
+		\begin{lstlisting}
+List<Person> list = peopleStream.collect(Collectors.toList());
+		\end{lstlisting}	
+		\subsubsection{Gruppieren}
+			\begin{lstlisting}
+Map<Integer, List<Person>> peopleByAge = 
+people.stream()
+.collect(Collectors.groupingBy(Person::getAge));
+			\end{lstlisting}
+
+
+
+
+\section{Input \& Output}
+	\subsection{Byte-Streams}
+		\subsubsection{Input}
+			\begin{lstlisting}
+var in = new FileInputStream("myFile.data"); 
+int value = in.read(); 
+while (value >= 0) {  //-1 = end
+	byte b = (byte)value;
+	// work with b
+	value = in.read(); }
+in.close();
+			\end{lstlisting}
+		
+
+		\subsubsection{Output}
+			\begin{lstlisting}
+var out = new FileOutputStream("test.txt"); 
+while (...) {
+	byte b = ...;
+	out.write(b); }
+out.close(); 
+			\end{lstlisting}
+
+	\subsection{Character-Strams}
+		\subsubsection{Zeichen lesen mit File Reader}
+			\begin{lstlisting}
+try (var reader = new FileReader("quotes.txt", StandardCharsets.UTF_8)){ 
+	int value = reader.read();
+	while (value >= 0) {
+		char c = (char)value;
+		// use character
+		value = reader.read();}}
+			\end{lstlisting}
+			\subsubsection{Zeilenweise Lesen mit Buffered Reader}
+			\begin{lstlisting}
+try (var reader = new BufferedReader(new FileReader("quotes.txt")) {
+	String line = reader.readLine(); 
+	while (line != null) {
+		System.out.println(line);
+		line = reader.readLine();}}
+			\end{lstlisting}
+			\subsubsection{Output}
+				\begin{lstlisting}
+try (var writer = new FileWriter("test.txt", StandardCharsets.UTF_8, true)){
+	writer.write("Hi");	}
+				\end{lstlisting} 
+
+		\subsection{Text-Datei-Zugriff}
+			\subsubsection{Ganze Text-Datei einlesen}
+				\begin{lstlisting}
+List<String> lines = Files.readAllLines(Path.of("in.txt"), StandardCharsets.UTF_8);
+				\end{lstlisting}
+			\subsubsection{Alle Zeilen als Stream API}
+				\begin{lstlisting}
+Stream<String> lines = Files.lines(Path.of("in.txt"), StandardCharsets.UTF_8);
+				\end{lstlisting}
+			\subsubsection{Ganze Text-Datei schreiben}
+				\begin{lstlisting}
+Files.write(Path.of("out.txt"), lines, StandardCharsets.UTF_8);
+				\end{lstlisting}
+
+		\subsection{Scanner}
+		\begin{lstlisting}
+public static String readConsole(String text) {
+	Scanner scanner = new Scanner(System.in);
+	String input = scanner.next();
+	scanner.close(); return input; }
+		\end{lstlisting}
+
+
+\section{Unit Testing}
+\begin{lstlisting}
+class StackTest {
+@Test 
+void testEmptyStack() {
+	assertArrayEquals(new int[]{2,4,6}, //erwartet
+	aufgerufeneMethode(new int[]{1,2,3}))} //eingabe
+	\end{lstlisting}
+	\begin{tabular}{|p{2cm} p{2.65cm}|}
+		\hline
+		Test&Bedingung\\
+		\hline
+		\hline
+		\tiny\texttt{assertEquals (expected, actual)}&\footnotesize Objects.equals(actual, expected) für primitive- und Referenz-Typen\\
+		\hline
+		\tiny\texttt{assertNotEquals (expected, actual)}&\footnotesize !Objects.equals(actual, expected)\\
+		\hline
+		\tiny\texttt{assertSame (expected, actual)}&\footnotesize actual == expected\newline $\rightarrow$ Referenzvergleich!!\\
+		\hline
+		\tiny\texttt{assertNotSame (expected, actual)}&\footnotesize expected != actual (Referenzvergleich) (nur für Referenztypen verwenden!)\\
+		\hline
+		\tiny\texttt{assertTrue(condition)}&\footnotesize condition\\
+		\hline
+		\tiny\texttt{assertFalse(condition)}&\footnotesize !condition\\
+		\hline
+		\tiny\texttt{assertNull(value)}&\footnotesize value == null\\
+		\hline
+		\tiny\texttt{assertNotNull(value)}&\footnotesize value != null\\
+		\hline
+		\tiny\texttt{fail(description)}&\footnotesize Immer verletzt\\
+		\hline
+		\tiny\texttt{assertThrows (StackException.class, () -> stack.pop())}&\footnotesize Exception\\
+		\hline
+	\end{tabular}
+
+\section{Regex}
+
+\begin{center}
+	\begin{tabular}{| p{1.8cm} p{.8cm} p{1.6cm}|}
+		\hline
+		&Regex&Gültige Texte\\
+		\hline
+		\hline
+		Konstante&Mi&''Mi''\\
+		\hline
+		Alternative&$Mo\textcolor{red}{|}Di$&''Mo'', ''Di''\\
+		\hline
+		Gruppierung&\textcolor{red}{(}M$|$D\textcolor{red}{)(}i$|$o\textcolor{red}{)}&''Mo'', ''Di'',..\\
+		\hline
+		Option&-\textcolor{red}{?}1&''-1'', ''1''\\
+		\hline
+		0 bis beliebig&1\textcolor{red}{*}&'''', ''1'', ''11'', ''111'', usw.\\
+		\hline
+		1 bis beliebig&1\textcolor{red}{+}&''1'',''11",''111''\\
+		\hline
+		min bis max&1\textcolor{red}{\{2,4\}}&''11'', ''111'',...\\
+		\hline
+		min bis beliebig&1\textcolor{red}{\{2,\}}&''11'',''111'',...\\
+		\hline
+		exakte Anzahl&1\textcolor{red}{\{3\}}&''111''\\
+		\hline
+		Aufzählung&\textcolor{red}{[}aeiou\textcolor{red}{]}&''a'', ''e'', ''i'',\\
+		\hline
+		Bereich&\textcolor{red}{[}a\textcolor{red}{-}z\textcolor{red}{]}&''a'', bis ''z''\\
+		\hline
+		Ausschluss&\textcolor{red}{[\textasciicircum}a\textcolor{red}{]}&Jedes Zeichen ausser ''a''\\
+		\hline
+		Vereinigung&\textcolor{red}{[}a\textcolor{red}{-}zA\textcolor{red}{-}Z\textcolor{red}{]}&a-z ||A-Z\\
+		\hline
+		Whitespace&\textcolor{red}{$\backslash$s}&Whitespace\\
+		\hline
+		Joker&\textcolor{red}{.}&Jedes Zeichen ausser $\backslash$n\\
+		\hline
+		Escapen&\textcolor{red}{$\backslash$$\backslash$}?&?\\
+		\hline
+	\end{tabular}
+\end{center}
+
+\vspace{-10pt}
+
+	%\columnbreak
+
+
+
+
+\section{Beispiele}
+	\subsubsection{Zyklen}
+		\begin{lstlisting}
+void checkAcylic(Atom current) {
+	checkAcylic(current, new HashSet<>());}
+			
+void checkAcylic(Atom current, Set<Atom> visited) {
+	if (visited.contains(current)) {
+		throw new RuntimeException("Cyclic!"); }
+	visited.add(current);
+	for (Atom follower : current.getZerfall()) {
+		checkAcylic(follower, new HashSet<>(visited));}}
+		\end{lstlisting}
+	\subsubsection{Array umkopieren}
+	\begin{lstlisting}
+void resort(int[] array) {
+	int index = unsortedIndex(array); //Index
+	int value = array[index]; 
+	delete(array, index); 
+	insert(array, value); }
+
+void delete(int[] array, int position) {
+	for (int i = position; i < array.length-1; i++) {
+	array[i] = array[i + 1]; 
+	array[array.length - 1] = Integer.MAX_VALUE;}}
+
+void insert(int[] array, int value) { 
+	int position = 0;
+	while (position < array.length && value > array[position]) { position++; }
+	for (int i = position; i < array.length-1; i++) {
+	array[i + 1] = array[i]; }array[position] = value;}
+	\end{lstlisting}
+	\subsubsection{Max-Clique}
+		\begin{lstlisting}
+Set<Person> maxClique() {
+	Set<Person> result = new HashSet<>();
+	for (Set<Person> group : allSubsets( new ArrayList<>(allPeople))) {
+	if (isClique(group)&&result.size()<group.size()) {
+			result = group;} } return result; }
+
+boolean isClique(Set<Person> group) { 
+	for (Person first : group) {
+		for (Person second : group) {
+			if (first != second && 
+			   !first.getFriends().contains(second)) {
+				return false; } } } return true; }
+
+Set<Set<Person>> allSubsets(List<Person> people) { 
+	Set<Set<Person>> result = new HashSet<>(); 
+	result.add(new HashSet<>());
+	for (Person current : people) {
+		List<Person>remaining = new ArrayList<>(people); 
+		remaining.remove(current);
+		for (Set<Person>subset : allSubsets(remaining)){
+			  result.add(subset);
+			  Set<Person>augmented =new HashSet<>(subset); 
+			  augmented.add(current); 
+			  result.add(augmented);} } return result; }
+
+		\end{lstlisting}
+	\subsubsection{Main Methode}
+		\begin{lstlisting}
+class Main {
+	public static void main(String[] args) {...} }		
+		\end{lstlisting}
+	\subsubsection{Compare To}
+		\begin{lstlisting}
+@FunctionalInterface
+interface Comparable<T> {
+	int compareTo(T other); }
+		
+class Person implements Comparable<Person> {
+	private int age;
+	@Override 
+	public int compareTo(Person other) {
+		return Integer.compare(age, other.age); }
+//oder
+	@Override 
+	public int compareTo(Person other) {
+		int result = lastName.compareTo(other.lastName);
+		if (result == 0) {
+			result = firstName.compareTo(other.firstName); } 
+		return result;}}
+//oder
+	people.sort(this::compareByAge);//in Methode
+//oder
+	(p1, p2) -> p1.compareTo(p2)
+		\end{lstlisting}
+	\subsubsection{Alle indirekten und direkten Elemente}
+		\begin{lstlisting}
+public Set<Atom> getAllSubAtoms(Atom current) {
+	Set<Atom> result = new HashSet<>();
+	for (Atom directAtom : current.zerfallsElemente) {
+		result.add(directAtom);
+		for (Atom indirectAtom : getAllSubAtoms(directAtom)) {
+		result.add(indirectAtom);}}
+			return result;}
+		\end{lstlisting}
+	\subsubsection{Alle indirekten und direkten Elemente zählen}
+		\begin{lstlisting}
+int count(List<Chapter> listOfContents) { 
+	int total = listOfContents.size();
+	for (Chapter chapter : listOfContents) {
+		total += count(chapter.getSubChapters()); }
+		return total; }
+		\end{lstlisting}
+	\subsubsection{Alle Wörter aus Buchstaben generieren}
+		\begin{lstlisting}
+Set<String> generateWords(Set<Character> input) { 
+	Set<String> result = new HashSet<>();
+	if (input.size() == 0) { result.add(""); }
+	for (Character letter : input) {
+		Set<Character> remainder = new HashSet<>(input); 
+		remainder.remove(letter);
+		for (String word : generateWords(remainder)) {
+			result.add(word + letter);}}
+	 return result;}
+		\end{lstlisting}
+	\subsubsection{Read \& Write @ same time}
+		\begin{lstlisting}
+void meth(String in, String out) throws IOException{ 
+	try (FileReader reader = new FileReader(in);
+			 FileWriter writer = new FileWriter(out)) { 
+			 int value = reader.read();
+			 while (value >= 0) {
+			  char character = (char)value; 
+			  	//Work with character....
+				writer.write(character));
+			 	value = reader.read(); } } }
+		\end{lstlisting}
+	\subsubsection{toSting()}
+		\begin{lstlisting}
+//Vaterklasse:
+public abstract String toString(int indent);			
+
+@Override
+public String toString() {
+	return toString(0);}
+
+protected String getIndent(int length) { 
+	String text = ""; } }
+  for (int i = 0; i < length; i++) { text += " ";}
+  return text;
+
+//Erbende Klasse:
+@Override
+public String toString(int indent) {
+	String text = getIndent(indent) + getName() +"\n";
+	for (Food food : ingredients) {
+	text += food.toString(indent + 1);}
+return text; } }
+		\end{lstlisting}
+	\subsubsection{Substring / Split}
+		\begin{lstlisting}
+int number = Integer.parseInt(line.substring(0, 3));
+String name = line.substring(4);
+
+String a = "1234 10"; String[] c = a.split(" ");
+		\end{lstlisting}
+
+	\subsubsection{Optimum an Elementen finden}	
+		\begin{lstlisting}
+Set<Item> solveRucksack(List<Item> allItems, 
+int maxWeight) { 
+	Set<Set<Item>>allCombinations =powerSet(allItems); 
+	Set<Item> optimum = new HashSet<>();
+	for (Set<Item> combination: allCombinations) {
+		if (totalWeight(combination) <= maxWeight && 
+			totalValue(combination)>totalValue(optimum)){
+				optimum = combination; } } 
+	return optimum; }
+
+Set<Item> solve(List<Item> allItems, int maxWeight){ 
+	Set<Set<Item>>allCombinations =powerSet(allItems); 
+	Set<Item> optimum = new HashSet<>(); //result
+	for (Set<Item> combination: allCombinations) {
+			if (totalWeight(combination) <= maxWeight && 
+			totalValue(combination) >totalValue(optimum)){
+					optimum = combination; }} return optimum;}
+
+int totalValue(Set<Item> combination) {
+	return combination.stream().mapToInt(item -> item.getValue()).sum();}
+
+int totalWeight(Set<Item> combination) {
+	return combination.stream().mapToInt(item -> item.getWeight()).sum();}
+		\end{lstlisting}
+	\subsubsection{powerSet (alle Kombinationen)}
+		\begin{lstlisting}
+<T> Set<Set<T>> powerSet(List<T> elements) {
+	if (elements.size() == 0) {
+		Set<Set<T>> empty = new HashSet<>(); 
+		empty.add(new HashSet<>()); return empty; } }
+
+	List<T> remaining = new ArrayList<>(elements);
+	T current = remaining.remove(0);
+	Set<Set<T>> result = new HashSet<>();
+	for (Set<T> set: powerSet(remaining)) {
+		result.add(set);
+		Set<T> augmentedSet = new HashSet<>(set); 
+		augmentedSet.add(current); 
+		result.add(augmentedSet); }
+	return result;
+		\end{lstlisting}
+	
+	
+	\subsubsection{MagicSquare Test}
+		\begin{lstlisting}
+public boolean isMagicSquare(int[][] square) { 
+	int sum1 = 0, sum2 = 0;
+    for(int i = 0; i < square.length; i++) { 
+		sum1 += square[i][i];
+		sum2 += square[i][square.length-1-i];
+		return sum1 == sum2; } }
+		\end{lstlisting}
+	\subsubsection{MagicSquare Generator}
+		\begin{lstlisting}
+int[][] computeMagicSquare(int size){
+	var square = new int[size][size];
+	if (fill(square, 0)) { return square;
+	} else { return null; //no solution } }
+
+boolean fill(int[][] square, int position) {
+	int size = square.length;
+	if (position == size * size) {
+		return isMagicSquare(square); }
+	for (int i = 1; i <= size * size; i++) {
+		if (available(sqare, position, number)) {
+			if (fill(square, position + 1)){
+				return true; } } }
+	return false; }
+
+boolean available(int[][] square, int position, int number) {
+	int size = square.length;
+	for (int index = 0; index < position; index++){
+		if (square[index/size][index%size] == number) {
+			return false; } }
+	return true; }
+		\end{lstlisting}
+	
+	\subsubsection{Alle Binärbäume}
+	\begin{lstlisting}
+class Node {
+	private final Node left, right; 
+	// Konstruktor und Getter }
+
+Set<Node> generate(int amount) {
+	var result = new HashSet<Node>(); 
+	if (amount == 0) { result.add(null); }
+	for (int part = 0; part < amount; part++) {
+		for (Node left : generate(part)) {
+			for (Node right : generate(amount-part-1)) {
+				result.add(new Node(left, right)); } } }
+		return result;}
+	\end{lstlisting}
+	\subsubsection{Fakultät}
+		\begin{lstlisting}
+staic long fact(long i){
+	if (i==0) return 1; else return i * fac(i - 1);}
+		\end{lstlisting}
+
+	\subsubsection{Switch - Case}
+		\begin{lstlisting}
+int x = 5; switch(x){
+	case 2: Syso("2"); break;
+	case 5: Syso("5"); break;
+	dafault: Syso("No match!"); break; }
+		\end{lstlisting}
+	\subsubsection{Lambda Beispiele}
+	Syntax: (Parameterliste) -> {Body}
+	\begin{lstlisting}
+
+stream().sort((p1, p2) -> 
+	Integer.compare(p1.getAge(), p2.getAge()))
+
+stream().filter(p -> p.getAge() >= 18)
+
+stream().filter( p -> p instanceof House)
+
+stream().filter( p -> p.getGender
+				.equals(Gender.FEMALE))
+
+stream().map(p -> p.getName()) //to String
+
+//Top 10 earner
+people.stream()
+	.sorted(Comparator.comparing(
+		Person::getSalary).reversed())
+	.mapToInt(p -> p.getSalary())
+	.limit(10)
+//get Max Age from People in Zurich
+people.stream()
+	.filter(p -> p.getCity().equals("Zuerich"))
+	.mapToInt(p -> p.getAge())
+	.max()
+	.getAsInt();
+//get Average Age of Male
+var x = people.stream()
+	.filter((p) -> p.getGender().equals(Gender.MALE))
+	.mapToInt(p -> p.getAge())
+	.average();
+//Get all female Names with 3 or less Characters
+	people.stream()
+	.filter((p) -> p.getGender().equals(Gender.FEMALE) 
+		&& p.getFirstName().length() <= 3)
+	.map(p -> p.getFirstName())
+//Durchschnittsalter pro Ort (mittels Collector)
+people.stream()
+	.collect(Collectors.groupingBy(Person::getCity, 
+			Collectors.averagingInt(Person::getAge)))
+	.forEach((city, age) -> 
+			System.out.println(city + " " + age));
+//All Elements in Object cotained in List
+catalogue.allProperties()
+	.filter(estate -> estate instanceof House)
+	.flatMap((estate -> 
+			((House)estate).getParkings().stream()));
+	\end{lstlisting}
+
+	\vspace{30pt}
+
+	\subsubsection{Stream Beispiele}
+		\begin{lstlisting}
+people.stream().map(p->p.name)
+IntStream.range(1, 100) // Zahlen von bis 100
+Stream.of(2,3,5,7) // Eigene Aufzaehlung
+Stream.concat(stream1, stream2) // 1 gefolgt von 2
+		\end{lstlisting}
+
+
+	
+	\subsection{compareTo}
+	\subsubsection{Comparator}
+		\begin{lstlisting}
+class AgeComparator implements Comparator<Person> {
+	@Override
+	public int compare(Person first, Person second){
+	return Integer.compare(first.getAge(), second.getAge() ); }
+		\end{lstlisting}
+	\subsubsection{Comparable}
+		\begin{lstlisting}
+class Person implements Comparable<Person> {
+	//.....
+	@Override
+	public int compareTo(Person other){
+		int result = lastName.compareTo(other.lastName);
+		if (result == 0){ 
+		 result = firstName.compareTo(other.firstName);}
+		return result;}
+		\end{lstlisting}
+	\subsection{Diverses Rekursives}
+	\subsubsection{Palindrom}
+	\begin{lstlisting}
+printPalindroms("", "", 0, 5); //in Main
+
+void printPalindroms(String prefix, String suffix, 
+int pos, int length) {
+	if (pos == (length + 1) / 2) {
+		System.out.println(prefix + suffix);
+	} else {
+		boolean middle = position == length / 2;
+		for (char c = 'A'; c <= 'Z'; c++) {
+			printPalindroms(prefix + c, middle ? 
+			suffix : c + suffix, position + 1, length);}}}
+	\end{lstlisting}
+	\subsubsection{Fibonacci}
+		\begin{lstlisting}
+static long fib(long n) {
+	if (n == 0) {return 0;
+	} else if(n == 1) { return 1;
+	} else { 
+		return fib(n-1) + fib(n-2);	} }
+		\end{lstlisting}
+	\subsubsection{Cluster von Personen}
+		\begin{lstlisting}
+boolean isLinked(Person from, Person to){
+	return isLinked(from, to, new HashSet<>()); }
+
+boolean isLinked (Person from, Person to, 
+Set<Person> visited) {
+	if (from == true) { return true;}
+	if (visited.contains(from)){
+		return false; }//dont check twice
+	visited.add(from);
+	for ( Person other: from.knownPeople()){
+		if (isLinked(other, to, visited)){
+			return true	} }
+	return false; }
+		\end{lstlisting}
+
+	\subsection{Sort}
+	\subsubsection{Bubble Sort}
+	\begin{lstlisting}
+boolean swapping;
+do{	swapping = false;
+	for(int i=0; i<array.length-1; i++){
+		if(array[i] > array[i+1]){
+			swap(array, i, i+1);
+			swapping = true; } }
+		} while(swapping);
+	\end{lstlisting}
+
+	\subsubsection{Quicksort}
+		\begin{lstlisting}
+void quicksort(int[] array, int left, int right){
+	int pivot = array[(left+right)/2];
+	int i = left, j = right;
+	while(i <=j ){
+		while(array[i] < pivot){i++; }
+		while(array[j] > pivot){j--; }
+		if(i <= j){
+		swap(array, i, j); i++; j--; } }
+	if(left < j){quicksort(array, left, j); }
+	if(i < right){quicksort(array, i, right); } }
+		\end{lstlisting}
+
+
+
+	\subsection{NP-vollständig}
+	\subsubsection{HAMPATH}
+		\begin{lstlisting}
+List<City> shortestRoundtrip(List<City> visited) { 
+	if (visited.size() == allCities.size()) {
+		return visited; }
+	int min = Integer.MAX_VALUE; 
+	List<City> best = null;
+	for (City next : allCities) {
+		if (!visited.contains(next)) {
+			List<City>expanded = new ArrayList<>(visited); 
+			expanded.add(next);
+			List<City>result =shortestRoundtrip(expanded); 
+			int distance = totalDistance(result);
+			if (distance < min) {
+				min = distance; 
+				best = result; } } } return best; }
+
+int totalDistance(List<City> roundtrip) { 
+	int sum = 0;
+	for (int index=0;index<roundtrip.size();index++){
+		City current = roundtrip.get(index);
+		City next = roundtrip.get((index + 1) % roundtrip.size()); 
+		sum += current.getConnections().get(next);
+		} return sum; }
+
+		\end{lstlisting}
+
+
+
+
+
+
+
+
+
+	
+
+
+\end{multicols*}
+
+% \input{./appendix.tex}
+
+\end{document}
